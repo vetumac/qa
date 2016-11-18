@@ -51,3 +51,23 @@ class OneTwo extends Test {
 
   override def getFileName: String = "1_02.html"
 }
+
+class OneThree extends Test {
+  override def getResult: Boolean = {
+    val document = Jsoup.parse(getStringByGet)
+
+    import collection.JavaConverters._
+
+    document.getElementsByTag("input").asScala
+      .filter(element => element.attr("type") == "text")
+      .forall(element => element.attr("value").isEmpty) &&
+      document.getElementsByTag("input").asScala
+        .filter(element => element.attr("type") == "radio")
+        .forall(element => element.attr("checked").isEmpty)
+
+  }
+
+  override def getTask: String = "По умолчанию все текстовые поля формы пусты, а значение поля «Пол» не выбрано."
+
+  override def getFileName: String = "1_03.html"
+}
