@@ -1,5 +1,8 @@
 package by.bsuir.qa
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
 import org.apache.http.client.methods.{HttpGet, HttpUriRequest, RequestBuilder}
 import org.apache.http.impl.client.HttpClientBuilder
 import org.jsoup.Jsoup
@@ -107,17 +110,46 @@ class TwoOne extends Test {
 
     import collection.JavaConverters._
 
-    document.getElementsByTag("input").asScala
-      .filter(element => element.attr("type") == "text").length == 3
-
-
-
-
-    last().getElementsContainingText("CoolSoft by Somebody").size() > 0
+    val inputs = document.getElementsByTag("input").asScala
+    inputs.count(element => element.attr("type") == "text") == 3 &&
+      inputs.count(element => element.attr("type") == "radio") == 2 &&
+      inputs.count(element => element.attr("type") == "submit") == 1
   }
 
   override def getTask: String = "Главная страница приложения сразу после открытия содержит форму с тремя текстовыми " +
     "полями, одной группой из двух радио-баттонов и одной кнопкой."
 
   override def getFileName: String = "2_01.html"
+}
+
+class TwoTwo extends Test {
+  override def getResult: Boolean = {
+    val document = Jsoup.parse(getStringByPostByHeightAndWeight("45", "501"))
+
+    import collection.JavaConverters._
+
+    document.getElementsContainingText("Рост должен быть в диапазоне 50-300 см.").asScala.nonEmpty &&
+      document.getElementsContainingText("Вес должен быть в диапазоне 3-500 кг.").asScala.nonEmpty
+  }
+
+  override def getTask: String = "При неверном вводе значений веса и/или роста появляются сообщения о том, что рост " +
+    "может быть в диапазоне «50-300 см», а вес – в диапазоне «3-500 кг»."
+
+  override def getFileName: String = "2_02.html"
+}
+
+class ThreeOne extends Test {
+  override def getResult: Boolean = {
+    val document = Jsoup.parse(getStringByGet)
+
+    val nowDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+
+    import collection.JavaConverters._
+
+    document.getElementsContainingText(nowDate).asScala.nonEmpty
+  }
+
+  override def getTask: String = "Проверить, что главная страница содержит текущую дату в формате «DD.MM.YYYY»."
+
+  override def getFileName: String = "3_01.html"
 }
